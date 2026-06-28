@@ -34,10 +34,13 @@ TRESP_DLOGT = np.full(18, 0.1)
 # Conversion factor: Due to the caluclation of DEM in logT scale
 FACTOR = 10**LOGT * np.log(10**TRESP_DLOGT)
 
+# Number of Monte Carlo dropout predictions for uncertainty estimation
+N_MC_PREDICTIONS = 100 
+
 # ── AIA temperature-response kernel ──────────────────────────────────────────
 # k_matrix shape: (6, 18) — six AIA EUV channels × 18 temperature bins.
 
-k_matrix = np.load("/Users/nikitabalodhi/Documents/data_prepped/k_matrix.npy")
+k_matrix = np.load("k_matrix.npy")
 kernel = np.expand_dims(np.expand_dims(np.transpose(k_matrix), axis=0), axis=0)
 
 
@@ -287,3 +290,53 @@ def build_model():
     )
 
     return train_model, test_model
+
+# Monte Carlo Inference
+# =============================================================================
+ 
+def run_mc_inference(
+    model: tf.keras.Model,
+    input_image: np.ndarray,
+    n_samples: int = 100,
+    device: str = "/device:CPU:0"):
+    """
+    Run Monte Carlo Dropout inference and aggregate stochastic predictions.
+
+    Performs ``n_samples`` stochastic forward passes with dropout active,
+    then returns the per-sample predictions so callers can compute means
+    and variances.
+
+    Parameters
+    ----------
+    model : tf.keras.Model
+        Loaded ``test_model`` with weights.
+    input_image : np.ndarray
+        Input tile of shape (H, W, n_channels).
+    n_samples : int
+        Number of stochastic forward passes.
+    device : str
+        TensorFlow device string.
+
+    Returns
+    -------
+    tuple
+        A tuple containing:
+        - ``dem_preds``: DEM predictions,  shape (n_samples, H, W, 18)
+        - ``img_preds``: image predictions, shape (n_samples, H, W, 6)
+    """
+    if input_image.shape == (512, 512, 6):
+        batch = img_scale(input_image[np.newaxis])  # (1, H, W, C)
+        dem_preds = []
+        img_preds = []
+
+        with tf.device(device):
+            for _ in range(n_samples):
+                out = model.predict(batch, verbose=0)
+                dem_preds.append(em_unscale(out["output_dem"]))
+                img_preds.append(img_unscale(out["output_img"]))
+
+        return dem_preds, img_preds
+    
+    else:
+        print(f"Input image needs to be (512, 512, 6), got {input_image.shape}")
+        return None
