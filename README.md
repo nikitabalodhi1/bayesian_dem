@@ -4,22 +4,6 @@ Bayesian Deep Learning approach for uncertainty-aware Differential Emission Meas
 
 This repository implements a Bayesian convolutional neural network that infers a DEM map from six-channel solar EUV images captured by the Atmospheric Imaging Assembly (AIA) instrument on NASA's Solar Dynamics Observatory (SDO). The model is designed to estimate not only the DEM but also uncertainty through Monte Carlo dropout and a learnable noise model.
 
-## Overview
-
-Differential Emission Measure (DEM) reconstruction is a central problem in solar physics: it estimates how plasma emission is distributed across temperature. In this project, the model learns a mapping from AIA intensity maps to DEM maps using a dual output head CNN reconstruction.
-
-The implementation includes:
-
-- A Bayesian CNN architecture for DEM inference
-- Monte Carlo dropout for stochastic uncertainty estimation
-- Learnable aleatoric noise modeling for pixel-wise uncertainty
-- A temperature-response kernel linking DEM predictions to synthetic AIA intensities
-- Training and evaluation scripts for solar image data
-
-## Scientific motivation
-
-The model is built for solar coronal analysis using SDO/AIA data. It reconstructs DEM as a function of temperature over a logarithmic grid and can be used to estimate emission measure in the solar corona while quantifying uncertainty.
-
 ## Repository contents
 
 - `bayesian_dem_model.py` — model architecture, loss functions, scaling utilities, and Monte Carlo inference helpers
