@@ -41,7 +41,7 @@ The training script expects local `.npy` data files containing paired AIA images
 /2014-05-18_split_dem.npy
 ```
 
-These paths are currently hardcoded as absolute paths. For a local workflow, place the corresponding data files in the expected locations or modify the file paths in `train_model.py` to point to your local dataset directory. The DEMs for training data are generated using the Regularised Inversion method given by [Hannah and Kontar. 2012](https://arxiv.org/abs/1201.2642)
+These paths are currently hardcoded as absolute paths. For a local workflow, place the corresponding data files in the expected locations or modify the file paths in `train_model.py` to point to your local dataset directory. The DEMs for training data are generated using the Regularised Inversion method given in [/demreg](https://github.com/ianan/demreg) by [Hannah and Kontar. 2012](https://arxiv.org/abs/1201.2642)
 
 ## Training
 
